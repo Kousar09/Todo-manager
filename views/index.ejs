@@ -4,12 +4,41 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=Todo Home Page, initial-scale=1.0">
-    <title>Document</title>
+    <title>Todo Manager</title>
     <link rel="stylesheet" href="./css/styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-   <%- include('header.ejs') %>
-   <%- include('todos.ejs') %>
-   <%- include("footer.ejs") %>
+    <div class="grid grid-cols-6">
+        <div class="col-start-3 col-span-2">
+            <%- include('header.ejs') %>
+            <form action="#">
+                <div class="flex gap-2 py-4">
+                    <div class="flex-auto">
+                        <input type="text" placeholder="what's next?" class="border border-grey-300 rounded text-grey-900 w-full p-2 text-sm" required />
+                    </div>
+                    <div class="flex-auto">
+                        <input type="date" class="border border-grey-300 rounded text-grey-900 w-full p-2 text-sm leading-4" />
+                    </div>
+                    <div class="flex-none">
+                        <button type="submit" class="bg-green-600 text-white px-5 py-2 rounded font-medium mr-2 mb-2 py-1.5">Add</button>
+                    </div>
+                </div>
+            </form>
+
+
+            <div class="mt-2">
+                <h5 style="display:inline"><id>Overdue</h5>
+                <span style="text-align:right" id='count-overdue' class="bg-gray-200 text-black px-3 py-1 rounded font-medium mr-2 mb-2">2</span>
+                <%- include('todos.ejs') %>
+                <h5 style="display:inline"><id>Due Today</h5>
+                <span style="text-align:right" id='count-due-today' class="bg-gray-200 text-black px-3 py-1 rounded font-medium mr-2 mb-2">2</span>
+                <%- include('todos.ejs') %>
+                <h5 style="display:inline"><id>Due Later</h5>
+                <span style="text-align:right" id='count-due-later' class="bg-gray-200 text-black px-3 py-1 rounded font-medium mr-2 mb-2">2</span>
+                <%- include('todos.ejs') %>
+              </div>
+        </div>
+    </div>
 </body>
 </html>
