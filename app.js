@@ -12,13 +12,21 @@ app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", async (request, response) => {
-  const overduetodos = await Todo.overdue();
-  const duetodaytodos = await Todo.dueToday();
-  const duelatertodos = await Todo.dueLater();
+  const overdue = await Todo.overdue();
+  const duetoday = await Todo.dueToday();
+  const duelater = await Todo.dueLater();
   if (request.accepts("html")) {
-    response.render("index", { overduetodos, duetodaytodos, duelatertodos });
+    response.render("index", {
+      overdue,
+      duetoday,
+      duelater,
+    });
   } else {
-    response.json({ overduetodos, duetodaytodos, duelatertodos });
+    response.json({
+      overdue,
+      duetoday,
+      duelater,
+    });
   }
 });
 
@@ -68,18 +76,14 @@ app.put("/todos/:id/markAsCompleted", async function (request, response) {
   }
 });
 
-app.delete("/todos/:id", async function (request, response) {
+app.delete("/todos/:id", async (request, response) => {
   console.log("We have to delete a Todo with ID: ", request.params.id);
-  // FILL IN YOUR CODE HERE
-  const deleteTodo = await Todo.destroy({
-    where: {
-      id: request.params.id,
-    },
-  });
-  response.send(deleteTodo ? true : false);
-
-  // First, we have to query our database to delete a Todo by ID.
-  // Then, we have to respond back with true/false based on whether the Todo was deleted or not.
+  try {
+    await Todo.remove(request.params.id);
+    return response.json({ success: true });
+  } catch (error) {
+    return response.status(422).json(error);
+  }
 });
 
 module.exports = app;
