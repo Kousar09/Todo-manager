@@ -73,21 +73,15 @@ describe("Todo test suite", () => {
     expect(response.statusCode).toBe(302);
   });
 
-  test("Update a todo with given ID as complete / incomplete", async () => {
-    const agent = request.agent(server);
+  test("Mark todo as a completed (updating todo)", async () => {
+    var agent = request.agent(server);
     await login(agent, "user.a@test.com", "123456789");
-    let res = await agent.get("/todos");
-    let csrfToken = extractCsrfToken(res);
+    var res = await agent.get("/todos");
+    var csrfToken = extractCsrfToken(res);
     await agent.post("/todos").send({
-      title: "Buy milk",
+      title: "play cricket",
       dueDate: new Date().toISOString(),
       completed: false,
-      _csrf: csrfToken,
-    });
-    await agent.post("/todos").send({
-      title: "Buy ps3",
-      dueDate: new Date().toISOString(),
-      completed: true,
       _csrf: csrfToken,
     });
 
@@ -98,20 +92,48 @@ describe("Todo test suite", () => {
     const dueTodayCount = parsedGroupedResponse.duetodaylist.length;
     const latestTodo = parsedGroupedResponse.duetodaylist[dueTodayCount - 1];
 
+    const status = latestTodo.completed ? false : true;
     res = await agent.get("/todos");
     csrfToken = extractCsrfToken(res);
 
-    const markCompleteResponse = await agent
+    const changeTodo = await agent
       .put(`/todos/${latestTodo.id}`)
-      .send({
-        _csrf: csrfToken,
-      });
+      .send({ _csrf: csrfToken, completed: status });
 
-    const parsedUpdateResponse = JSON.parse(markCompleteResponse.text);
-    parsedUpdateResponse.completed
-      ? expect(parsedUpdateResponse.completed).toBe(true)
-      : expect(parsedUpdateResponse.completed).toBe(false);
+    const parseUpadteTodo = JSON.parse(changeTodo.text);
+    expect(parseUpadteTodo.completed).toBe(true);
   });
+  test("Mark todo as  incompleted (updating todo)", async () => {
+    var agent = request.agent(server);
+    await login(agent, "user.a@test.com", "123456789");
+    var res = await agent.get("/todos");
+    var csrfToken = extractCsrfToken(res);
+    await agent.post("/todos").send({
+      title: "play cricket",
+      dueDate: new Date().toISOString(),
+      completed: false,
+      _csrf: csrfToken,
+    });
+
+    const groupedTodosResponse = await agent
+      .get("/todos")
+      .set("Accept", "application/json");
+    const parsedGroupedResponse = JSON.parse(groupedTodosResponse.text);
+    const dueTodayCount = parsedGroupedResponse.duetodaylist.length;
+    const latestTodo = parsedGroupedResponse.duetodaylist[dueTodayCount - 1];
+
+    const status = latestTodo.completed ? true : false;
+    res = await agent.get("/todos");
+    csrfToken = extractCsrfToken(res);
+
+    const changeTodo = await agent
+      .put(`/todos/${latestTodo.id}`)
+      .send({ _csrf: csrfToken, completed: status });
+
+    const parseUpadteTodo = JSON.parse(changeTodo.text);
+    expect(parseUpadteTodo.completed).toBe(false);
+  });
+
   test("Deletes a todo with the given ID if it exists and sends a boolean response", async () => {
     // FILL IN YOUR CODE HERE
     const agent = request.agent(server);
