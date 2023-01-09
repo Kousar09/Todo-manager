@@ -124,7 +124,7 @@ app.post("/users", async (request, response) => {
     });
   } catch (error) {
     console.log(error);
-    request.flash("error", error.message);
+    request.flash("error", "user already exist");
     return response.redirect("/signup");
   }
 });
